@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34701.34
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HID-LightingAudio", "HID-LightingAudio.csproj", "{A63A484C-8B0D-4DBB-9505-360C0E2F425B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A63A484C-8B0D-4DBB-9505-360C0E2F425B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A63A484C-8B0D-4DBB-9505-360C0E2F425B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A63A484C-8B0D-4DBB-9505-360C0E2F425B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A63A484C-8B0D-4DBB-9505-360C0E2F425B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {ACAC71D4-CB8D-4E75-ABD9-24A089CBE9CF}
+	EndGlobalSection
+EndGlobal
