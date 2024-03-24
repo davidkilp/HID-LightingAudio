@@ -261,7 +261,7 @@ namespace HID_LightingAudio
             Controls.Add(LEDFrontgroupBox);
             Controls.Add(groupBox1);
             Name = "Form1";
-            Text = "Form1";
+            Text = "HID Lighting & Audio Control";
             ((System.ComponentModel.ISupportInitialize)FrontnumericUpDown1).EndInit();
             ((System.ComponentModel.ISupportInitialize)RearnumericUpDown1).EndInit();
             ((System.ComponentModel.ISupportInitialize)FrontBlinkUpDown).EndInit();
