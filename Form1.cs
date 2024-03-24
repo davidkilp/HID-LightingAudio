@@ -13,16 +13,36 @@ namespace HID_LightingAudio
         bool DLL_Loaded = false;
         byte Front_LED_cycle = 0;
         byte Front_GRPPWM = 0;
+        byte Front_GRPFREQ = 0;
         byte Rear_LED_cycle = 0;
         byte Rear_GRPPWM = 0;
+        byte Rear_GRPFREQ = 0;
 
-        private enum LED_Strip_Type
+        // PCA9632 Registers
+        private enum PCA9632Reg
+        {
+            MODE1 = 0x00,           // Mode register 1
+            MODE2 = 0x01,           // Mode register 2
+            PWM0 = 0x02,            // brightness congtrol LED0
+            PWM1 = 0x03,            // brightness congtrol LED1
+            PWM2 = 0x04,            // brightness congtrol LED2
+            PWM3 = 0x05,            // brightness congtrol LED3
+            GRPPWM = 0x06,          // group duty cycle control
+            GRPFREQ = 0x07,         // group frequency
+            LEDOUT = 0x08,          // LED output state
+            SUBADR1 = 0x09,         // I2C-bus subaddress1
+            SUBADR2 = 0x0A,         // I2C-bus subaddress2
+            SUBADR3 = 0x0B,         // I2C-bus subaddress3
+            ALLCALLADR = 0x0C       // LED All Call I2C bus address
+        }
+
+        private enum LED_I2C_ADR
         {
             LED_STRIP_FRONT = 0x60,
             LED_STRIP_REAR = 0x63
         }
 
-        private enum LED_STRIP_COLOR
+        private enum LED_COLOR
         {
             RED,
             GREEN,
@@ -412,14 +432,14 @@ namespace HID_LightingAudio
             // -- Initialize the Front Strip -- 
             // Configure PCA9632 Mode Register 1 (00h) to Enable oscillator, no auto-increment
             // Set Mode Register 2 (MODE2 = 0x01) 00000000
-            if (WritePCA9632Register(LED_Strip_Type.LED_STRIP_FRONT, 0x00, 0x00) == 1)
+            if (WritePCA9632Register(LED_I2C_ADR.LED_STRIP_FRONT, PCA9632Reg.MODE1, 0x00) == 1)
             {
                 return 1;
             }
 
             // Configure PCA9632 device for External N-Type driver without pullups INVRT(4)=1, OUTDRV(2)=1 or INVRT=0, OUTDRV=1
             // Set Mode Register 2 (MODE2 = 0x01) 0001 0101 = 0x15
-            if (WritePCA9632Register(LED_Strip_Type.LED_STRIP_FRONT, 0x01, 0x15) == 1)
+            if (WritePCA9632Register(LED_I2C_ADR.LED_STRIP_FRONT, PCA9632Reg.MODE2, 0x15) == 1)
             {
                 return 1;
             }
@@ -427,29 +447,37 @@ namespace HID_LightingAudio
             // -- Initialize the Rear Strip -- 
             // Configure PCA9632 Mode Register 1 (00h) to Enable oscillator, no auto-increment
             // Set Mode Register 2 (MODE2 = 0x01) 00000000
-            if (WritePCA9632Register(LED_Strip_Type.LED_STRIP_REAR, 0x00, 0x00) == 1)
+            if (WritePCA9632Register(LED_I2C_ADR.LED_STRIP_REAR, PCA9632Reg.MODE1, 0x00) == 1)
             {
                 return 1;
             }
 
-            // Configure PCA9632 device for External N-Type driver without pullups INVRT(4)=1, OUTDRV(2)=1 or INVRT=0, OUTDRV=1
+            // Configure PCA9632 device for External N-Type driver without pullups INVRT(4)=1, OUTDRV(2)=1
             // Set Mode Register 2 (MODE2 = 0x01) 0001 0101 = 0x15
-            if (WritePCA9632Register(LED_Strip_Type.LED_STRIP_REAR, 0x01, 0x15) == 1)
+            if (WritePCA9632Register(LED_I2C_ADR.LED_STRIP_REAR, PCA9632Reg.MODE2, 0x15) == 1)
             {
                 return 1;
             }
 
-            // Initialize the PWM registers
-            WritePWMxRegister(LED_Strip_Type.LED_STRIP_FRONT, 0xFF);
-            WritePWMxRegister(LED_Strip_Type.LED_STRIP_REAR, 0xFF);
+            // Initialize the PWMx registers(PWM0..PWM3) for full on
+            WritePWMxRegister(LED_I2C_ADR.LED_STRIP_FRONT, 0xFF);
+            WritePWMxRegister(LED_I2C_ADR.LED_STRIP_REAR, 0xFF);
 
             // Read the current GRPPWN (06h) - Group Duty Cycle Control value of Front Strip
-            Front_GRPPWM = ReadPCA9632Register(LED_Strip_Type.LED_STRIP_FRONT, 0x06);
+            Front_GRPPWM = ReadPCA9632Register(LED_I2C_ADR.LED_STRIP_FRONT, PCA9632Reg.GRPPWM);
             FrontnumericUpDown1.Value = Front_GRPPWM >> 4;  // lower 4-bits are unused in Group PWM mode
 
             // Read the current GRPPWN (06h) - Group Duty Cycle Control value of Rear Strip
-            Rear_GRPPWM = ReadPCA9632Register(LED_Strip_Type.LED_STRIP_REAR, 0x06);
+            Rear_GRPPWM = ReadPCA9632Register(LED_I2C_ADR.LED_STRIP_REAR, PCA9632Reg.GRPPWM);
             RearnumericUpDown1.Value = Rear_GRPPWM >> 4;
+
+            // Read the current GRPFREQ (07h) - Group Frequency Control value of Front Strip
+            Front_GRPFREQ = ReadPCA9632Register(LED_I2C_ADR.LED_STRIP_FRONT, PCA9632Reg.GRPFREQ);
+            FrontBlinkUpDown.Value = Front_GRPFREQ;
+
+            // Read the current GRPFREQ (07h) - Group Frequency Control value of Rear Strip
+            Rear_GRPFREQ = ReadPCA9632Register(LED_I2C_ADR.LED_STRIP_REAR, PCA9632Reg.GRPFREQ);
+            RearBlinkUpDown.Value = Rear_GRPFREQ;
 
 
             //ReadPCA9632Registers(LED_Strip_Type.LED_STRIP_FRONT);
@@ -458,7 +486,7 @@ namespace HID_LightingAudio
         }
 
         // Write a single register with a value
-        private byte WritePCA9632Register(LED_Strip_Type Strip, byte Register, byte Value)
+        private byte WritePCA9632Register(LED_I2C_ADR Strip, PCA9632Reg Register, byte Value)
         {
             UInt32 writeLength = 0;
             UInt32 numBytesToWrite = 0;
@@ -468,7 +496,7 @@ namespace HID_LightingAudio
             IntPtr pnt = Marshal.AllocHGlobal(size);
 
             // First Set Control Register(00h) to tell it no autoincrement and what register to write, then value
-            writeBuffer[0] = Register;
+            writeBuffer[0] = (byte)Register;
             writeBuffer[1] = Value;
 
             numBytesToWrite = 2;
@@ -485,10 +513,10 @@ namespace HID_LightingAudio
 
         // Write all 4 PWM registers with a new value for dimming
         // In individual brightness there are 256 steps (0-0xFF)
-        // In Group Dimming mode, there are 64 steps 00h to 3Fh and on 6 MSBs are used,
+        // In Group Dimming mode, there are 64 steps 00h to 3Fh and only 6 MSBs are used,
         // lower 2 LSBs are ignored.
-        // We use the auto-increment brightness regsiters only mode here (1010
-        private byte WritePWMxRegister(LED_Strip_Type Strip, byte Value)
+        // We use the auto-increment brightness regsiter only mode here (1010) starting at PWM0(02h)
+        private byte WritePWMxRegister(LED_I2C_ADR Strip, byte Value)
         {
             UInt32 writeLength = 0;
             UInt32 numBytesToWrite = 0;
@@ -498,7 +526,7 @@ namespace HID_LightingAudio
             int size = Marshal.SizeOf(writeBuffer[0]) * writeBuffer.Length;
             IntPtr pnt = Marshal.AllocHGlobal(size);
 
-            // First Set Control Register(00h) to tell it no autoincrement and what register to write, then value
+            // First Set Control Register(00h) for autoincrement with starting register to write, then value(s)
             writeBuffer[0] = Register;
             writeBuffer[1] = Value;     // PWM0
             writeBuffer[2] = Value;     // PWM1
@@ -517,7 +545,7 @@ namespace HID_LightingAudio
             return 0;
         }
 
-        private byte ReadPCA9632Register(LED_Strip_Type Strip, byte Register)
+        private byte ReadPCA9632Register(LED_I2C_ADR Strip, PCA9632Reg Register)
         {
             // Read register specified of the PCA9632 LED Driver chip
             byte[] Reading = new byte[25];
@@ -531,7 +559,7 @@ namespace HID_LightingAudio
             IntPtr pnt = Marshal.AllocHGlobal(size);
 
             // Set ControlReg to register to read without increment
-            registers[0] = Register;
+            registers[0] = (byte)Register;
             numBytesToWrite = 1;
             Marshal.Copy(registers, 0, pnt, registers.Length);
             Status = FT260_I2CMaster_Write(ft260handle, (uint)Strip, FT260_I2C_FLAG.FT260_I2C_START_AND_STOP, pnt, numBytesToWrite, ref writeLength);
@@ -568,7 +596,7 @@ namespace HID_LightingAudio
             return Reading[0];
         }
 
-        private byte ReadAllPCA9632Registers(LED_Strip_Type Strip)
+        private byte ReadAllPCA9632Registers(LED_I2C_ADR Strip)
         {
             // Read ALL registers of the PCA9632 LED Driver chip
             byte[] Reading = new byte[25];
@@ -619,7 +647,7 @@ namespace HID_LightingAudio
             return 0;
         }
 
-        private void SetLedColor(LED_Strip_Type Strip, LED_STRIP_COLOR Color)
+        private void SetLedColor(LED_I2C_ADR Strip, LED_COLOR Color)
         {
             byte pca_color = 0;
             //byte led_out_state = PCA9632_LEDOUT.LDRx_ON;      // LED Driver fully on
@@ -633,40 +661,40 @@ namespace HID_LightingAudio
 
             switch (Color)
             {
-                case LED_STRIP_COLOR.RED:
+                case LED_COLOR.RED:
                     pca_color = Red;
                     break;
-                case LED_STRIP_COLOR.GREEN:
+                case LED_COLOR.GREEN:
                     pca_color = Green;
                     break;
-                case LED_STRIP_COLOR.BLUE:
+                case LED_COLOR.BLUE:
                     pca_color = Blue;
                     break;
-                case LED_STRIP_COLOR.WHITE:
-                    // All RGB on (LDRx= 0001 0101 = 0x15)
+                case LED_COLOR.WHITE:
+                    // All on: R+G+B
                     pca_color = (byte)(Red | Green | Blue);
                     break;
-                case LED_STRIP_COLOR.YELLOW:
+                case LED_COLOR.YELLOW:
                     // R+G on 
                     pca_color = (byte)(Red | Green);
                     break;
-                case LED_STRIP_COLOR.CYAN:
-                    // G+B on  0001 0001 = 0x11;
+                case LED_COLOR.CYAN:
+                    // G+B on
                     pca_color = (byte)(Green | Blue);
                     break;
-                case LED_STRIP_COLOR.MAGENTA:
-                    // R+B on  0001 0100 = 0x14;
+                case LED_COLOR.MAGENTA:
+                    // R+B 
                     pca_color = (byte)(Red | Blue);
                     break;
 
-                case LED_STRIP_COLOR.OFF:
+                case LED_COLOR.OFF:
                 default:
                     pca_color = 0x00;
                     break;
             }
 
             // Set LEDOUT (08h) to turn on specific LED
-            if (WritePCA9632Register(Strip, 0x08, pca_color) == 1)
+            if (WritePCA9632Register(Strip, PCA9632Reg.LEDOUT, pca_color) == 1)
             {
                 return;
             }
@@ -679,37 +707,37 @@ namespace HID_LightingAudio
             switch (Front_LED_cycle)
             {
                 case 1:
-                    SetLedColor(LED_Strip_Type.LED_STRIP_FRONT, LED_STRIP_COLOR.RED);
+                    SetLedColor(LED_I2C_ADR.LED_STRIP_FRONT, LED_COLOR.RED);
                     labelStatus.Text = "Front: Red";
                     break;
                 case 2:
-                    SetLedColor(LED_Strip_Type.LED_STRIP_FRONT, LED_STRIP_COLOR.GREEN);
+                    SetLedColor(LED_I2C_ADR.LED_STRIP_FRONT, LED_COLOR.GREEN);
                     labelStatus.Text = "Front: Green";
                     break;
                 case 3:
                     // set BLUE
-                    SetLedColor(LED_Strip_Type.LED_STRIP_FRONT, LED_STRIP_COLOR.BLUE);
+                    SetLedColor(LED_I2C_ADR.LED_STRIP_FRONT, LED_COLOR.BLUE);
                     labelStatus.Text = "Front: Blue";
                     break;
                 case 4:
-                    SetLedColor(LED_Strip_Type.LED_STRIP_FRONT, LED_STRIP_COLOR.WHITE);
+                    SetLedColor(LED_I2C_ADR.LED_STRIP_FRONT, LED_COLOR.WHITE);
                     labelStatus.Text = "Front: White";
                     break;
                 case 5:
-                    SetLedColor(LED_Strip_Type.LED_STRIP_FRONT, LED_STRIP_COLOR.YELLOW);
+                    SetLedColor(LED_I2C_ADR.LED_STRIP_FRONT, LED_COLOR.YELLOW);
                     labelStatus.Text = "Front: Yellow";
                     break;
                 case 6:
-                    SetLedColor(LED_Strip_Type.LED_STRIP_FRONT, LED_STRIP_COLOR.CYAN);
+                    SetLedColor(LED_I2C_ADR.LED_STRIP_FRONT, LED_COLOR.CYAN);
                     labelStatus.Text = "Front: Cyan";
                     break;
                 case 7:
-                    SetLedColor(LED_Strip_Type.LED_STRIP_FRONT, LED_STRIP_COLOR.MAGENTA);
+                    SetLedColor(LED_I2C_ADR.LED_STRIP_FRONT, LED_COLOR.MAGENTA);
                     labelStatus.Text = "Front: Magenta";
                     break;
 
                 default:
-                    SetLedColor(LED_Strip_Type.LED_STRIP_FRONT, LED_STRIP_COLOR.OFF);
+                    SetLedColor(LED_I2C_ADR.LED_STRIP_FRONT, LED_COLOR.OFF);
                     Front_LED_cycle = 0;    // reset cycle counter
                     labelStatus.Text = "Front: Off";
                     break;
@@ -766,36 +794,36 @@ namespace HID_LightingAudio
             switch (Rear_LED_cycle)
             {
                 case 1:
-                    SetLedColor(LED_Strip_Type.LED_STRIP_REAR, LED_STRIP_COLOR.RED);
+                    SetLedColor(LED_I2C_ADR.LED_STRIP_REAR, LED_COLOR.RED);
                     labelStatus.Text = "Rear: Red";
                     break;
                 case 2:
-                    SetLedColor(LED_Strip_Type.LED_STRIP_REAR, LED_STRIP_COLOR.GREEN);
+                    SetLedColor(LED_I2C_ADR.LED_STRIP_REAR, LED_COLOR.GREEN);
                     labelStatus.Text = "Rear: Green";
                     break;
                 case 3:
-                    SetLedColor(LED_Strip_Type.LED_STRIP_REAR, LED_STRIP_COLOR.BLUE);
+                    SetLedColor(LED_I2C_ADR.LED_STRIP_REAR, LED_COLOR.BLUE);
                     labelStatus.Text = "Rear: Blue";
                     break;
                 case 4:
-                    SetLedColor(LED_Strip_Type.LED_STRIP_REAR, LED_STRIP_COLOR.WHITE);
+                    SetLedColor(LED_I2C_ADR.LED_STRIP_REAR, LED_COLOR.WHITE);
                     labelStatus.Text = "Rear: White";
                     break;
                 case 5:
-                    SetLedColor(LED_Strip_Type.LED_STRIP_REAR, LED_STRIP_COLOR.YELLOW);
+                    SetLedColor(LED_I2C_ADR.LED_STRIP_REAR, LED_COLOR.YELLOW);
                     labelStatus.Text = "Rear: Yello";
                     break;
                 case 6:
-                    SetLedColor(LED_Strip_Type.LED_STRIP_REAR, LED_STRIP_COLOR.CYAN);
+                    SetLedColor(LED_I2C_ADR.LED_STRIP_REAR, LED_COLOR.CYAN);
                     labelStatus.Text = "Rear: Cyan";
                     break;
                 case 7:
-                    SetLedColor(LED_Strip_Type.LED_STRIP_REAR, LED_STRIP_COLOR.MAGENTA);
+                    SetLedColor(LED_I2C_ADR.LED_STRIP_REAR, LED_COLOR.MAGENTA);
                     labelStatus.Text = "Rear: Magenta";
                     break;
 
                 default:
-                    SetLedColor(LED_Strip_Type.LED_STRIP_REAR, LED_STRIP_COLOR.OFF);
+                    SetLedColor(LED_I2C_ADR.LED_STRIP_REAR, LED_COLOR.OFF);
                     Rear_LED_cycle = 0;    // reset cycle counter
                     labelStatus.Text = "Rear: Off";
                     break;
@@ -805,10 +833,10 @@ namespace HID_LightingAudio
 
         private void FrontnumericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-            // Change Front brightness Global indicator-
+            // Change Front brightness Global PWM value
             byte value = (byte)FrontnumericUpDown1.Value;
             Front_GRPPWM = (byte)(value << 4);
-            if (WritePCA9632Register(LED_Strip_Type.LED_STRIP_FRONT, 0x06, Front_GRPPWM) == 1)
+            if (WritePCA9632Register(LED_I2C_ADR.LED_STRIP_FRONT, PCA9632Reg.GRPPWM, Front_GRPPWM) == 1)
             {
                 return;
             }
@@ -816,13 +844,45 @@ namespace HID_LightingAudio
 
         private void RearnumericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-            // Change Rear brightness Global indicator-
-            byte value = (byte) RearnumericUpDown1.Value;
+            // Change Rear brightness Global PWM value
+            byte value = (byte)RearnumericUpDown1.Value;
             Rear_GRPPWM = (byte)(value << 0x04);
-            if (WritePCA9632Register(LED_Strip_Type.LED_STRIP_REAR, 0x06, Rear_GRPPWM) == 1)
+            if (WritePCA9632Register(LED_I2C_ADR.LED_STRIP_REAR, PCA9632Reg.GRPPWM, Rear_GRPPWM) == 1)
             {
                 return;
             }
+        }
+
+        private void FrontBlinkcheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            // Toggle Front Global Blinking Mode
+            // Read MODE2 register and flip DMBLNK bit(5) to 1
+            int mode2 = (int)ReadPCA9632Register(LED_I2C_ADR.LED_STRIP_FRONT, PCA9632Reg.MODE2);
+            mode2 ^= (1 << 5);
+            WritePCA9632Register(LED_I2C_ADR.LED_STRIP_FRONT, PCA9632Reg.MODE2, (byte)mode2);
+        }
+
+        private void FrontBlinkUpDown_ValueChanged(object sender, EventArgs e)
+        {
+            // change Front Group Frequency (GRPFREQ).
+            byte value = (byte)FrontBlinkUpDown.Value;
+            WritePCA9632Register(LED_I2C_ADR.LED_STRIP_FRONT, PCA9632Reg.GRPFREQ, value);
+        }
+
+        private void RearBlinkcheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            // Toggle Rear Global Blinking Mode
+            // Read MODE2 register and flip DMBLNK bit(5) to 1
+            int mode2 = (int)ReadPCA9632Register(LED_I2C_ADR.LED_STRIP_REAR, PCA9632Reg.MODE2);
+            mode2 ^= (1 << 5);
+            WritePCA9632Register(LED_I2C_ADR.LED_STRIP_REAR, PCA9632Reg.MODE2, (byte)mode2);
+        }
+
+        private void RearBlinkUpDown_ValueChanged(object sender, EventArgs e)
+        {
+            // change Rear Group Frequency (GRPFREQ).
+            byte value = (byte)RearBlinkUpDown.Value;
+            WritePCA9632Register(LED_I2C_ADR.LED_STRIP_REAR, PCA9632Reg.GRPFREQ, value);
         }
     }
 

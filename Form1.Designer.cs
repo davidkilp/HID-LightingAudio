@@ -31,11 +31,7 @@ namespace HID_LightingAudio
         private void InitializeComponent()
         {
             button1 = new Button();
-            label1 = new Label();
-            label2 = new Label();
             button2 = new Button();
-            label3 = new Label();
-            label4 = new Label();
             checkBox1 = new CheckBox();
             checkBox2 = new CheckBox();
             label5 = new Label();
@@ -44,13 +40,25 @@ namespace HID_LightingAudio
             RearnumericUpDown1 = new NumericUpDown();
             label6 = new Label();
             label7 = new Label();
+            FrontBlinkcheckbox = new CheckBox();
+            FrontBlinkUpDown = new NumericUpDown();
+            RearBlinkUpDown = new NumericUpDown();
+            RearBlinkcheckbox = new CheckBox();
+            LEDFrontgroupBox = new GroupBox();
+            groupBox1 = new GroupBox();
+            AudiogroupBox = new GroupBox();
             ((System.ComponentModel.ISupportInitialize)FrontnumericUpDown1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)RearnumericUpDown1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)FrontBlinkUpDown).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)RearBlinkUpDown).BeginInit();
+            LEDFrontgroupBox.SuspendLayout();
+            groupBox1.SuspendLayout();
+            AudiogroupBox.SuspendLayout();
             SuspendLayout();
             // 
             // button1
             // 
-            button1.Location = new Point(88, 87);
+            button1.Location = new Point(28, 35);
             button1.Name = "button1";
             button1.Size = new Size(118, 45);
             button1.TabIndex = 0;
@@ -58,29 +66,9 @@ namespace HID_LightingAudio
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label1.Location = new Point(88, 54);
-            label1.Name = "label1";
-            label1.Size = new Size(56, 25);
-            label1.TabIndex = 1;
-            label1.Text = "Front";
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Font = new Font("Segoe UI", 14F);
-            label2.Location = new Point(267, 54);
-            label2.Name = "label2";
-            label2.Size = new Size(49, 25);
-            label2.TabIndex = 2;
-            label2.Text = "Rear";
-            // 
             // button2
             // 
-            button2.Location = new Point(267, 87);
+            button2.Location = new Point(29, 35);
             button2.Name = "button2";
             button2.Size = new Size(118, 45);
             button2.TabIndex = 3;
@@ -88,31 +76,11 @@ namespace HID_LightingAudio
             button2.UseVisualStyleBackColor = true;
             button2.Click += button2_Click;
             // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Font = new Font("Segoe UI", 16F);
-            label3.Location = new Point(60, 24);
-            label3.Name = "label3";
-            label3.Size = new Size(132, 30);
-            label3.TabIndex = 4;
-            label3.Text = "LED Control:";
-            // 
-            // label4
-            // 
-            label4.AutoSize = true;
-            label4.Font = new Font("Segoe UI", 16F);
-            label4.Location = new Point(60, 251);
-            label4.Name = "label4";
-            label4.Size = new Size(75, 30);
-            label4.TabIndex = 5;
-            label4.Text = "Audio:";
-            // 
             // checkBox1
             // 
             checkBox1.AutoSize = true;
             checkBox1.Font = new Font("Segoe UI", 14F);
-            checkBox1.Location = new Point(88, 284);
+            checkBox1.Location = new Point(28, 24);
             checkBox1.Name = "checkBox1";
             checkBox1.Size = new Size(99, 29);
             checkBox1.TabIndex = 6;
@@ -124,7 +92,7 @@ namespace HID_LightingAudio
             // 
             checkBox2.AutoSize = true;
             checkBox2.Font = new Font("Segoe UI", 14F);
-            checkBox2.Location = new Point(221, 284);
+            checkBox2.Location = new Point(160, 24);
             checkBox2.Name = "checkBox2";
             checkBox2.Size = new Size(75, 29);
             checkBox2.TabIndex = 7;
@@ -136,7 +104,7 @@ namespace HID_LightingAudio
             // 
             label5.AutoSize = true;
             label5.Font = new Font("Segoe UI", 16F);
-            label5.Location = new Point(60, 334);
+            label5.Location = new Point(37, 346);
             label5.Name = "label5";
             label5.Size = new Size(75, 30);
             label5.TabIndex = 8;
@@ -146,7 +114,7 @@ namespace HID_LightingAudio
             // 
             labelStatus.AutoSize = true;
             labelStatus.Enabled = false;
-            labelStatus.Location = new Point(141, 346);
+            labelStatus.Location = new Point(118, 358);
             labelStatus.Name = "labelStatus";
             labelStatus.Size = new Size(29, 15);
             labelStatus.TabIndex = 12;
@@ -154,22 +122,22 @@ namespace HID_LightingAudio
             // 
             // FrontnumericUpDown1
             // 
-            FrontnumericUpDown1.Font = new Font("Segoe UI", 14F);
-            FrontnumericUpDown1.Location = new Point(88, 196);
+            FrontnumericUpDown1.Font = new Font("Segoe UI", 18F);
+            FrontnumericUpDown1.Location = new Point(28, 115);
             FrontnumericUpDown1.Maximum = new decimal(new int[] { 15, 0, 0, 0 });
             FrontnumericUpDown1.Name = "FrontnumericUpDown1";
-            FrontnumericUpDown1.Size = new Size(118, 32);
+            FrontnumericUpDown1.Size = new Size(118, 39);
             FrontnumericUpDown1.TabIndex = 13;
             FrontnumericUpDown1.Tag = "Front Brightness";
             FrontnumericUpDown1.ValueChanged += FrontnumericUpDown1_ValueChanged;
             // 
             // RearnumericUpDown1
             // 
-            RearnumericUpDown1.Font = new Font("Segoe UI", 14F);
-            RearnumericUpDown1.Location = new Point(267, 196);
+            RearnumericUpDown1.Font = new Font("Segoe UI", 18F);
+            RearnumericUpDown1.Location = new Point(29, 112);
             RearnumericUpDown1.Maximum = new decimal(new int[] { 15, 0, 0, 0 });
             RearnumericUpDown1.Name = "RearnumericUpDown1";
-            RearnumericUpDown1.Size = new Size(118, 32);
+            RearnumericUpDown1.Size = new Size(118, 39);
             RearnumericUpDown1.TabIndex = 14;
             RearnumericUpDown1.Tag = "Front Brightness";
             RearnumericUpDown1.ValueChanged += RearnumericUpDown1_ValueChanged;
@@ -178,45 +146,132 @@ namespace HID_LightingAudio
             // 
             label6.AutoSize = true;
             label6.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label6.Location = new Point(88, 163);
+            label6.Location = new Point(17, 88);
             label6.Name = "label6";
-            label6.Size = new Size(83, 21);
+            label6.Size = new Size(163, 21);
             label6.TabIndex = 15;
-            label6.Text = "Brightness";
+            label6.Text = "Brightness/Duty Cycle";
             // 
             // label7
             // 
             label7.AutoSize = true;
             label7.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label7.Location = new Point(267, 163);
+            label7.Location = new Point(6, 88);
             label7.Name = "label7";
-            label7.Size = new Size(83, 21);
+            label7.Size = new Size(163, 21);
             label7.TabIndex = 16;
-            label7.Text = "Brightness";
+            label7.Text = "Brightness/Duty Cycle";
+            // 
+            // FrontBlinkcheckbox
+            // 
+            FrontBlinkcheckbox.AutoSize = true;
+            FrontBlinkcheckbox.Font = new Font("Segoe UI", 14F);
+            FrontBlinkcheckbox.Location = new Point(65, 183);
+            FrontBlinkcheckbox.Name = "FrontBlinkcheckbox";
+            FrontBlinkcheckbox.Size = new Size(99, 29);
+            FrontBlinkcheckbox.TabIndex = 18;
+            FrontBlinkcheckbox.Text = "Blinking";
+            FrontBlinkcheckbox.UseVisualStyleBackColor = true;
+            FrontBlinkcheckbox.CheckedChanged += FrontBlinkcheckbox_CheckedChanged;
+            // 
+            // FrontBlinkUpDown
+            // 
+            FrontBlinkUpDown.Font = new Font("Segoe UI", 16F);
+            FrontBlinkUpDown.Location = new Point(28, 188);
+            FrontBlinkUpDown.Maximum = new decimal(new int[] { 255, 0, 0, 0 });
+            FrontBlinkUpDown.Name = "FrontBlinkUpDown";
+            FrontBlinkUpDown.Size = new Size(118, 36);
+            FrontBlinkUpDown.TabIndex = 19;
+            FrontBlinkUpDown.Tag = "Front Brightness";
+            FrontBlinkUpDown.ValueChanged += FrontBlinkUpDown_ValueChanged;
+            // 
+            // RearBlinkUpDown
+            // 
+            RearBlinkUpDown.Font = new Font("Segoe UI", 16F);
+            RearBlinkUpDown.Location = new Point(29, 188);
+            RearBlinkUpDown.Maximum = new decimal(new int[] { 255, 0, 0, 0 });
+            RearBlinkUpDown.Name = "RearBlinkUpDown";
+            RearBlinkUpDown.Size = new Size(118, 36);
+            RearBlinkUpDown.TabIndex = 21;
+            RearBlinkUpDown.Tag = "Front Brightness";
+            RearBlinkUpDown.ValueChanged += RearBlinkUpDown_ValueChanged;
+            // 
+            // RearBlinkcheckbox
+            // 
+            RearBlinkcheckbox.AutoSize = true;
+            RearBlinkcheckbox.Font = new Font("Segoe UI", 14F);
+            RearBlinkcheckbox.Location = new Point(29, 157);
+            RearBlinkcheckbox.Name = "RearBlinkcheckbox";
+            RearBlinkcheckbox.Size = new Size(99, 29);
+            RearBlinkcheckbox.TabIndex = 20;
+            RearBlinkcheckbox.Text = "Blinking";
+            RearBlinkcheckbox.UseVisualStyleBackColor = true;
+            RearBlinkcheckbox.CheckedChanged += RearBlinkcheckbox_CheckedChanged;
+            // 
+            // LEDFrontgroupBox
+            // 
+            LEDFrontgroupBox.Controls.Add(label6);
+            LEDFrontgroupBox.Controls.Add(FrontBlinkUpDown);
+            LEDFrontgroupBox.Controls.Add(button1);
+            LEDFrontgroupBox.Controls.Add(FrontnumericUpDown1);
+            LEDFrontgroupBox.Font = new Font("Segoe UI", 16F);
+            LEDFrontgroupBox.Location = new Point(37, 23);
+            LEDFrontgroupBox.Name = "LEDFrontgroupBox";
+            LEDFrontgroupBox.Size = new Size(200, 237);
+            LEDFrontgroupBox.TabIndex = 22;
+            LEDFrontgroupBox.TabStop = false;
+            LEDFrontgroupBox.Text = "Front LED Strip";
+            // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(RearBlinkcheckbox);
+            groupBox1.Controls.Add(label7);
+            groupBox1.Controls.Add(RearBlinkUpDown);
+            groupBox1.Controls.Add(button2);
+            groupBox1.Controls.Add(RearnumericUpDown1);
+            groupBox1.Font = new Font("Segoe UI", 16F);
+            groupBox1.Location = new Point(266, 23);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(183, 237);
+            groupBox1.TabIndex = 23;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Rear LED Strip";
+            // 
+            // AudiogroupBox
+            // 
+            AudiogroupBox.Controls.Add(checkBox2);
+            AudiogroupBox.Controls.Add(checkBox1);
+            AudiogroupBox.Font = new Font("Segoe UI", 14F);
+            AudiogroupBox.Location = new Point(37, 272);
+            AudiogroupBox.Name = "AudiogroupBox";
+            AudiogroupBox.Size = new Size(264, 59);
+            AudiogroupBox.TabIndex = 24;
+            AudiogroupBox.TabStop = false;
+            AudiogroupBox.Text = "Audio";
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(624, 405);
-            Controls.Add(label7);
-            Controls.Add(label6);
-            Controls.Add(RearnumericUpDown1);
-            Controls.Add(FrontnumericUpDown1);
+            Controls.Add(AudiogroupBox);
+            Controls.Add(FrontBlinkcheckbox);
             Controls.Add(labelStatus);
             Controls.Add(label5);
-            Controls.Add(checkBox2);
-            Controls.Add(checkBox1);
-            Controls.Add(label4);
-            Controls.Add(label3);
-            Controls.Add(button2);
-            Controls.Add(label2);
-            Controls.Add(label1);
-            Controls.Add(button1);
+            Controls.Add(LEDFrontgroupBox);
+            Controls.Add(groupBox1);
             Name = "Form1";
             Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)FrontnumericUpDown1).EndInit();
             ((System.ComponentModel.ISupportInitialize)RearnumericUpDown1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)FrontBlinkUpDown).EndInit();
+            ((System.ComponentModel.ISupportInitialize)RearBlinkUpDown).EndInit();
+            LEDFrontgroupBox.ResumeLayout(false);
+            LEDFrontgroupBox.PerformLayout();
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
+            AudiogroupBox.ResumeLayout(false);
+            AudiogroupBox.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -224,11 +279,7 @@ namespace HID_LightingAudio
         #endregion
 
         private Button button1;
-        private Label label1;
-        private Label label2;
         private Button button2;
-        private Label label3;
-        private Label label4;
         private CheckBox checkBox1;
         private CheckBox checkBox2;
         private Label label5;
@@ -237,6 +288,13 @@ namespace HID_LightingAudio
         private NumericUpDown RearnumericUpDown1;
         private Label label6;
         private Label label7;
+        private CheckBox FrontBlinkcheckbox;
+        private NumericUpDown FrontBlinkUpDown;
+        private NumericUpDown RearBlinkUpDown;
+        private CheckBox RearBlinkcheckbox;
+        private GroupBox LEDFrontgroupBox;
+        private GroupBox groupBox1;
+        private GroupBox AudiogroupBox;
     }
 
 }
