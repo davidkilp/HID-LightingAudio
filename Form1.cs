@@ -355,7 +355,7 @@ namespace HID_LightingAudio
 
             // -------------------------------------------------------------------------------------
 
-            Status = FT260_I2CMaster_Init(ft260handle, 100);
+            Status = FT260_I2CMaster_Init(ft260handle, 1000);   // 1 Mbit/s Fm+ mode
 
             if (Status != FT260_STATUS.FT260_OK)
             {
@@ -562,8 +562,7 @@ namespace HID_LightingAudio
             registers[0] = (byte)Register;
             numBytesToWrite = 1;
             Marshal.Copy(registers, 0, pnt, registers.Length);
-            Status = FT260_I2CMaster_Write(ft260handle, (uint)Strip, FT260_I2C_FLAG.FT260_I2C_START_AND_STOP, pnt, numBytesToWrite, ref writeLength);
-
+            Status = FT260_I2CMaster_Write(ft260handle, (uint)Strip, FT260_I2C_FLAG.FT260_I2C_REPEATED_START, pnt, numBytesToWrite, ref writeLength);
             if ((Status != FT260_STATUS.FT260_OK) || (writeLength != numBytesToWrite))
             {
                 SetControls_Error("Error: Please check hardware and re-start application", Status);
@@ -572,7 +571,6 @@ namespace HID_LightingAudio
 
             numBytesToRead = 1;
             Status = FT260_I2CMaster_Read(ft260handle, (uint)Strip, FT260_I2C_FLAG.FT260_I2C_START_AND_STOP, pnt, numBytesToRead, ref readLength, 5000);
-
             if (Status == FT260_STATUS.FT260_OTHER_ERROR)
             {
                 SetControls_Error("Please check hardware and re-start application", Status);
