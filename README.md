@@ -1,4 +1,5 @@
 # HID Gate Lighting & Audio Control
+NOTE: This is for the first prototype devices only. New devices should use the FpLtg solution. 
 
 ## Summary
 Control the front and rear lighting strips, enable, disable and mute audio for the HID gate.
